@@ -2,9 +2,9 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** 此处后端没有提供注释 POST /user/user/add */
+/** 此处后端没有提供注释 POST /user/add */
 export async function addUser(body: API.UserAddDTO, options?: { [key: string]: any }) {
-  return request<API.ResultBoolean>('/user/user/add', {
+  return request<API.ResultBoolean>('/user/add', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -14,9 +14,9 @@ export async function addUser(body: API.UserAddDTO, options?: { [key: string]: a
   })
 }
 
-/** 此处后端没有提供注释 DELETE /user/user/delete */
+/** 此处后端没有提供注释 DELETE /user/delete */
 export async function deleteUsingDelete(body: API.DeleteRequest, options?: { [key: string]: any }) {
-  return request<API.ResultBoolean>('/user/user/delete', {
+  return request<API.ResultBoolean>('/user/delete', {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -26,17 +26,17 @@ export async function deleteUsingDelete(body: API.DeleteRequest, options?: { [ke
   })
 }
 
-/** 此处后端没有提供注释 GET /user/user/get/login */
+/** 此处后端没有提供注释 GET /user/get/login */
 export async function getLoginUser(options?: { [key: string]: any }) {
-  return request<API.ResultLoginUserVO>('/user/user/get/login', {
+  return request<API.ResultLoginUserVO>('/user/get/login', {
     method: 'GET',
     ...(options || {}),
   })
 }
 
-/** 此处后端没有提供注释 POST /user/user/login */
+/** 此处后端没有提供注释 POST /user/login */
 export async function login(body: API.UserLoginDTO, options?: { [key: string]: any }) {
-  return request<API.ResultLoginUserVO>('/user/user/login', {
+  return request<API.ResultLoginUserVO>('/user/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -46,17 +46,25 @@ export async function login(body: API.UserLoginDTO, options?: { [key: string]: a
   })
 }
 
-/** 此处后端没有提供注释 GET /user/user/logout */
-export async function logout(options?: { [key: string]: any }) {
-  return request<API.ResultBoolean>('/user/user/logout', {
+/** 此处后端没有提供注释 GET /user/login/github */
+export async function githubLogin(options?: { [key: string]: any }) {
+  return request<any>('/user/login/github', {
     method: 'GET',
     ...(options || {}),
   })
 }
 
-/** 此处后端没有提供注释 POST /user/user/register */
+/** 此处后端没有提供注释 GET /user/logout */
+export async function logout(options?: { [key: string]: any }) {
+  return request<API.ResultBoolean>('/user/logout', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
+/** 此处后端没有提供注释 POST /user/register */
 export async function register(body: API.UserRegisterDTO, options?: { [key: string]: any }) {
-  return request<API.ResultLong>('/user/user/register', {
+  return request<API.ResultLong>('/user/register', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -54,6 +54,17 @@
         </div>
       </a-form>
 
+      <div class="social-login">
+        <div class="divider">
+          <span class="divider-text">其他登录方式</span>
+        </div>
+        <div class="social-icons">
+          <div class="social-icon-wrapper" @click="handleGithubLogin">
+            <GithubOutlined class="github-icon" />
+          </div>
+        </div>
+      </div>
+
       <footer class="form-footer">
         <span class="footer-text">还没有账号？</span>
         <RouterLink to="/user/register" class="register-link">立即注册</RouterLink>
@@ -66,6 +77,7 @@
 import { login } from '@/api/userController'
 import { useLoginUserStore } from '@/stores/loginUser'
 import { message } from 'ant-design-vue'
+import { GithubOutlined } from '@ant-design/icons-vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -93,6 +105,10 @@ const handleSubmit = async () => {
   } catch (err: any) {
     message.error('登录失败,' + err.message)
   }
+}
+
+const handleGithubLogin = () => {
+  window.location.href = 'http://localhost:8080/api/user/login/github'
 }
 </script>
 
@@ -275,6 +291,72 @@ const handleSubmit = async () => {
 
   &:active {
     transform: translateY(0);
+  }
+}
+
+/* Social Login */
+.social-login {
+  margin-top: 32px;
+
+  .divider {
+    position: relative;
+    text-align: center;
+    margin-bottom: 24px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .divider-text {
+      position: relative;
+      background: #fdfdfd; /* Match the blurred background feel */
+      padding: 0 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+
+    .social-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: var(--accent-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+
+        .github-icon {
+          color: var(--accent-color);
+        }
+      }
+
+      .github-icon {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+      }
+    }
   }
 }
 
