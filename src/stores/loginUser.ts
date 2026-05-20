@@ -9,9 +9,15 @@ export const useLoginUserStore = defineStore('loginUser', () => {
   })
 
   async function fetchLoginUser() {
-    const res = await getLoginUser()
-    if (res.data.code === 200 && res.data.data) {
-      loginUser.value = res.data.data
+    try {
+      const res = await getLoginUser()
+      if (res.data.code === 200 && res.data.data) {
+        loginUser.value = res.data.data
+      }
+      return true
+    } catch (error) {
+      console.error('fetchLoginUser error:', error)
+      return false
     }
   }
 

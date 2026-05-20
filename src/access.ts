@@ -9,9 +9,11 @@ router.beforeEach(async (to, from, next) => {
   const loginUserStore = useLoginUserStore()
   let loginUser = loginUserStore.loginUser
   if (firstFetchLoginUser) {
-    await loginUserStore.fetchLoginUser()
+    const isSuccess = await loginUserStore.fetchLoginUser()
+    if (isSuccess) {
+      firstFetchLoginUser = false
+    }
     loginUser = loginUserStore.loginUser
-    firstFetchLoginUser = false
   }
 
   const toUrl = to.fullPath
