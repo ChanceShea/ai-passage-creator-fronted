@@ -18,6 +18,11 @@ const router = createRouter({
       name: '用户注册',
       component: () => import('@/views/user/UserRegisterView.vue'),
     },
+    {
+      path: '/article/create',
+      name: '文章创作',
+      component: () => import('@/views/article/ArticleCreateVIew.vue'),
+    },
   ],
 })
 

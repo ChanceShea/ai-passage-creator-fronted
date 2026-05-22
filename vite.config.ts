@@ -6,13 +6,26 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
+  plugins: [vue(), vueDevTools()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        // 增加以下配置以更好地支持 SSE
+        ws: true,
+        configure: (proxy, options) => {
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            // 确保不缓存，这对于打字机效果至关重要
+            res.setHeader('Cache-Control', 'no-cache, no-transform')
+          })
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
 })

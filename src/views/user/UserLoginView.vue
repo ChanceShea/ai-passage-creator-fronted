@@ -108,7 +108,7 @@ const handleSubmit = async () => {
 }
 
 const handleGithubLogin = () => {
-  window.location.href = 'http://localhost:8080/api/user/login/github'
+  window.location.href = '/api/user/login/github'
 }
 </script>
 
