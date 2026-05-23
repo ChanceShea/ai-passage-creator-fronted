@@ -544,18 +544,12 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .article-create-view {
-  --primary-color: #1a1a1a;
-  --accent-color: #6366f1;
-  --text-main: #1f2937;
-  --text-muted: #6b7280;
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --border-glass: rgba(255, 255, 255, 0.4);
-
   min-height: calc(100vh - 64px);
-  background-color: #f8fafc;
+  background-color: var(--bg-page);
   position: relative;
   overflow: hidden;
   font-family: 'Montserrat', sans-serif;
+  transition: background-color 0.3s ease;
 }
 
 /* Background Decorations */
@@ -658,8 +652,8 @@ onBeforeUnmount(() => {
 
     .flow-indicator {
       background: var(--primary-color);
-      color: white;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      color: var(--text-inverse);
+      box-shadow: 0 10px 20px rgba(var(--primary-color-rgb), 0.1);
       border-color: transparent;
     }
   }
@@ -677,8 +671,8 @@ onBeforeUnmount(() => {
     width: 36px;
     height: 36px;
     border-radius: 12px;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--bg-page);
+    border: 1px solid var(--border-glass);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -777,17 +771,17 @@ onBeforeUnmount(() => {
   }
 
   .topic-textarea {
-    background: rgba(255, 255, 255, 0.5) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background: var(--bg-glass-deep) !important;
+    border: 1px solid var(--border-glass) !important;
     border-radius: 20px !important;
     padding: 24px !important;
     font-size: 1.15rem !important;
     transition: all 0.3s ease;
     margin-bottom: 32px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+    color: var(--text-main) !important;
 
     &:focus {
-      background: white !important;
+      background: var(--bg-glass) !important;
       border-color: var(--accent-color) !important;
       box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
     }
@@ -802,12 +796,13 @@ onBeforeUnmount(() => {
     font-size: 1.15rem !important;
     width: 100%;
     letter-spacing: 0.02em;
+    color: var(--text-inverse) !important;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2) !important;
-      background: #000 !important;
+      box-shadow: 0 15px 30px rgba(var(--primary-color-rgb), 0.2) !important;
+      opacity: 0.9;
     }
   }
 }
@@ -880,7 +875,7 @@ onBeforeUnmount(() => {
     position: relative;
     padding-left: 20px;
     margin-bottom: 8px;
-    color: #4a5568;
+    color: var(--text-main);
 
     &::before {
       content: '';
@@ -896,17 +891,17 @@ onBeforeUnmount(() => {
 }
 
 .content-preview {
-  background: white;
+  background: var(--bg-surface);
   border-radius: 40px;
   padding: 80px;
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--card-shadow);
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border-glass);
 }
 
 .markdown-body {
   line-height: 1.85;
-  color: #2d3748;
+  color: var(--text-main);
   font-size: 1.15rem;
   font-family: 'Montserrat', sans-serif;
 
@@ -926,7 +921,7 @@ onBeforeUnmount(() => {
   }
   :deep(h2) {
     font-size: 2rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border-glass);
     padding-bottom: 0.6em;
   }
   :deep(h3) {
@@ -954,11 +949,11 @@ onBeforeUnmount(() => {
   :deep(blockquote) {
     margin: 2.5em 0;
     padding: 2em 2.5em;
-    background: #f8fafc;
+    background: var(--bg-surface-soft);
     border-left: 5px solid var(--accent-color);
     border-radius: 0 24px 24px 0;
     font-style: italic;
-    color: #4a5568;
+    color: var(--text-muted);
     font-size: 1.2rem;
   }
 
@@ -972,7 +967,7 @@ onBeforeUnmount(() => {
   }
 
   :deep(code) {
-    background: #f1f5f9;
+    background: var(--bg-surface-soft);
     padding: 0.2em 0.4em;
     border-radius: 6px;
     font-size: 0.9em;
@@ -992,10 +987,10 @@ onBeforeUnmount(() => {
 
 .image-progress-box {
   margin-top: 48px;
-  background: white;
+  background: var(--bg-surface);
   padding: 32px;
   border-radius: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-glass);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.02);
 
   .progress-header {
@@ -1093,8 +1088,8 @@ onBeforeUnmount(() => {
 
   .hot-tag {
     padding: 10px 18px;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
     border-radius: 12px;
     font-size: 0.85rem;
     color: var(--text-main);
@@ -1107,6 +1102,7 @@ onBeforeUnmount(() => {
       color: var(--accent-color);
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+      background: var(--bg-surface-soft);
     }
   }
 }
@@ -1119,8 +1115,8 @@ onBeforeUnmount(() => {
   .tip-icon {
     width: 28px;
     height: 28px;
-    background: var(--primary-color);
-    color: white;
+    background: var(--bg-surface-soft);
+    color: var(--accent-color);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -1128,6 +1124,7 @@ onBeforeUnmount(() => {
     font-weight: 700;
     font-size: 0.8rem;
     flex-shrink: 0;
+    border: 1px solid var(--border-glass);
   }
 
   .tip-title {
@@ -1192,25 +1189,27 @@ onBeforeUnmount(() => {
   transition: all 0.3s !important;
 
   &:not(.primary) {
-    background: white !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    color: var(--primary-color) !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-glass) !important;
+    color: var(--text-main) !important;
 
     &:hover {
-      border-color: var(--primary-color) !important;
+      border-color: var(--accent-color) !important;
       transform: translateY(-2px);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05) !important;
+      background: var(--bg-surface-soft) !important;
     }
   }
 
   &.primary {
     background: var(--primary-color) !important;
+    color: var(--text-inverse) !important;
     border: none !important;
 
     &:hover {
-      background: #000 !important;
+      opacity: 0.9;
       transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+      box-shadow: 0 10px 20px rgba(var(--primary-color-rgb), 0.15) !important;
     }
   }
 }
@@ -1221,10 +1220,10 @@ onBeforeUnmount(() => {
   gap: 16px;
 
   .stat-item {
-    background: white;
+    background: var(--bg-surface);
     padding: 16px;
     border-radius: 16px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-glass);
     text-align: center;
 
     .stat-value {

@@ -231,19 +231,13 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .article-detail-view {
-  --primary-color: #1a1a1a;
-  --accent-color: #6366f1;
-  --text-main: #1f2937;
-  --text-muted: #6b7280;
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --border-glass: rgba(255, 255, 255, 0.4);
-
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: var(--bg-page);
   position: relative;
   overflow: hidden;
   padding-bottom: 80px;
   font-family: 'Montserrat', sans-serif;
+  transition: background-color 0.3s ease;
 }
 
 /* Background Decorations */
@@ -314,8 +308,8 @@ onMounted(() => {
       height: 44px;
       padding: 0 20px;
       border-radius: 12px;
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      background: white;
+      border: 1px solid var(--border-glass);
+      background: var(--bg-surface);
       font-weight: 600;
       color: var(--text-main);
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -324,6 +318,7 @@ onMounted(() => {
         transform: translateX(-4px);
         border-color: var(--accent-color);
         color: var(--accent-color);
+        background: var(--bg-surface-soft);
       }
     }
 
@@ -337,20 +332,21 @@ onMounted(() => {
         padding: 0 24px;
         border-radius: 12px;
         font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.1);
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
         &:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 8px 20px rgba(var(--primary-color-rgb), 0.15);
         }
       }
 
       .export-btn {
         background: var(--primary-color);
+        color: var(--text-inverse);
         border: none;
         &:hover {
-          background: #000;
+          opacity: 0.9;
         }
       }
     }
@@ -371,7 +367,7 @@ onMounted(() => {
   backdrop-filter: blur(30px);
   border-radius: 40px !important;
   border: 1px solid var(--border-glass) !important;
-  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: var(--card-shadow) !important;
   padding: 40px 20px;
 
   :deep(.ant-card-body) {

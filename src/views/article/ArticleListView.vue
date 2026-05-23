@@ -383,19 +383,13 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .article-list-view {
-  --primary-color: #1a1a1a;
-  --accent-color: #6366f1;
-  --text-main: #1f2937;
-  --text-muted: #6b7280;
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --border-glass: rgba(255, 255, 255, 0.4);
-
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: var(--bg-page);
   position: relative;
   overflow: hidden;
   padding-bottom: 60px;
   font-family: 'Montserrat', sans-serif;
+  transition: background-color 0.3s ease;
 }
 
 /* Background Decorations */
@@ -485,15 +479,15 @@ onMounted(() => {
     font-weight: 600;
     font-size: 1rem;
     background: var(--primary-color);
-    color: white;
+    color: var(--text-inverse);
     border: none;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 20px rgba(var(--primary-color-rgb), 0.1);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:hover {
-      background: #000;
+      opacity: 0.9;
       transform: translateY(-2px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 15px 30px rgba(var(--primary-color-rgb), 0.15);
     }
   }
 }
@@ -525,8 +519,8 @@ onMounted(() => {
     :deep(.ant-picker),
     :deep(.ant-select-selector) {
       border-radius: 12px !important;
-      border: 1px solid rgba(0, 0, 0, 0.06) !important;
-      background: rgba(255, 255, 255, 0.6) !important;
+      border: 1px solid var(--border-glass) !important;
+      background: var(--bg-glass-deep) !important;
       backdrop-filter: blur(10px);
       height: 48px !important;
       display: flex;
@@ -535,7 +529,7 @@ onMounted(() => {
 
       &:hover {
         border-color: var(--accent-color) !important;
-        background: #fff !important;
+        background: var(--bg-glass) !important;
       }
     }
 
@@ -555,11 +549,11 @@ onMounted(() => {
     color: var(--text-muted);
     font-size: 0.85rem;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--bg-glass-deep);
     backdrop-filter: blur(10px);
     padding: 8px 18px;
     border-radius: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-glass);
   }
 }
 
@@ -568,7 +562,7 @@ onMounted(() => {
   backdrop-filter: blur(20px);
   border-radius: 32px !important;
   border: 1px solid var(--border-glass) !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: var(--card-shadow) !important;
   overflow: hidden;
 
   :deep(.ant-card-body) {
@@ -582,19 +576,19 @@ onMounted(() => {
   }
 
   :deep(.ant-table-thead > tr > th) {
-    background: rgba(0, 0, 0, 0.02) !important;
+    background: rgba(var(--primary-color-rgb), 0.02) !important;
     color: var(--primary-color);
     font-weight: 700;
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 20px 24px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid var(--border-glass);
   }
 
   :deep(.ant-table-tbody > tr > td) {
     padding: 20px 24px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--border-glass);
     transition: all 0.3s ease;
   }
 

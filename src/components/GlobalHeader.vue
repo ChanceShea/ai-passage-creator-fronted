@@ -22,6 +22,34 @@
       </nav>
 
       <div class="header-right">
+        <div class="theme-switcher">
+          <a-tooltip>
+            <a-dropdown placement="bottomRight">
+              <div class="theme-btn">
+                <BulbOutlined v-if="themeStore.theme === 'light'" />
+                <BulbFilled v-else-if="themeStore.theme === 'dark'" />
+                <DesktopOutlined v-else />
+              </div>
+              <template #overlay>
+                <a-menu :selected-keys="[themeStore.theme]">
+                  <a-menu-item key="light" @click="themeStore.setTheme('light')">
+                    <BulbOutlined />
+                    <span>浅色模式</span>
+                  </a-menu-item>
+                  <a-menu-item key="dark" @click="themeStore.setTheme('dark')">
+                    <BulbFilled />
+                    <span>深色模式</span>
+                  </a-menu-item>
+                  <a-menu-item key="auto" @click="themeStore.setTheme('auto')">
+                    <DesktopOutlined />
+                    <span>跟随系统</span>
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+          </a-tooltip>
+        </div>
+
         <div v-if="loginUserStore.loginUser.id" class="user-area">
           <a-dropdown placement="bottomRight">
             <div class="user-info">
@@ -51,13 +79,20 @@
 
 <script setup lang="ts">
 import { useLoginUserStore } from '@/stores/loginUser'
+import { useThemeStore } from '@/stores/theme'
 import { logout } from '@/api/userController'
 import { message } from 'ant-design-vue'
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons-vue'
+import {
+  LogoutOutlined,
+  UserOutlined,
+  BulbOutlined,
+  DesktopOutlined,
+  BulbFilled,
+} from '@ant-design/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
-import { computed } from 'vue'
 
 const loginUserStore = useLoginUserStore()
+const themeStore = useThemeStore()
 const router = useRouter()
 const currentRoute = useRoute()
 
@@ -82,14 +117,9 @@ const handleLogout = async () => {
 
 <style scoped lang="scss">
 .header {
-  --header-height: 72px;
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --border-glass: rgba(255, 255, 255, 0.4);
-  --accent-color: #6366f1;
-
   height: var(--header-height);
   line-height: var(--header-height);
-  background: var(--bg-glass);
+  background: var(--header-bg);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-glass);
   padding: 0;
@@ -97,6 +127,9 @@ const handleLogout = async () => {
   top: 0;
   z-index: 100;
   width: 100%;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .header-container {
@@ -126,7 +159,7 @@ const handleLogout = async () => {
     font-family: 'Playfair Display', serif;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #1a1a1a;
+    color: var(--text-main);
     margin: 0;
     letter-spacing: -0.02em;
   }
@@ -137,31 +170,26 @@ const handleLogout = async () => {
   gap: 32px;
 
   .nav-item {
-    font-size: 0.95rem;
+    color: var(--text-muted);
     font-weight: 600;
-    color: #6b7280;
+    font-size: 0.95rem;
+    padding: 0 12px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
-    padding: 4px 0;
 
     &:hover {
-      color: #1a1a1a;
+      color: var(--text-main);
+      background: rgba(0, 0, 0, 0.03);
     }
 
     &.active {
       color: var(--accent-color);
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -4px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: var(--accent-color);
-        border-radius: 2px;
-      }
+      background: rgba(99, 102, 241, 0.06);
     }
   }
 }
@@ -169,30 +197,54 @@ const handleLogout = async () => {
 .header-right {
   display: flex;
   align-items: center;
+  gap: 16px;
 }
 
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 12px;
-  transition: all 0.3s ease;
+.theme-switcher {
+  .theme-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-main);
+    transition: all 0.3s;
+    border: 1px solid transparent;
 
-  &:hover {
-    background: rgba(0, 0, 0, 0.03);
+    &:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--accent-color);
+    }
   }
+}
 
-  .user-avatar {
-    border: 2px solid white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  }
+.user-area {
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
 
-  .user-name {
-    font-weight: 600;
-    color: #1a1a1a;
-    font-size: 0.9rem;
+    &:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .user-avatar {
+      border: 2px solid white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
   }
 }
 

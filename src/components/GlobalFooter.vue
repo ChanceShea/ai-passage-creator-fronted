@@ -40,15 +40,13 @@ import { GithubOutlined } from '@ant-design/icons-vue'
 
 <style scoped lang="scss">
 .footer {
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --border-glass: rgba(255, 255, 255, 0.4);
-  --accent-color: #6366f1;
-
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   border-top: 1px solid var(--border-glass);
   padding: 60px 0 30px;
-  margin-top: auto;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .footer-container {
@@ -84,13 +82,13 @@ import { GithubOutlined } from '@ant-design/icons-vue'
       font-family: 'Playfair Display', serif;
       font-size: 1.25rem;
       font-weight: 800;
-      color: #1a1a1a;
+      color: var(--text-main);
       letter-spacing: -0.01em;
     }
   }
 
   .brand-desc {
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 0.95rem;
     line-height: 1.6;
   }
@@ -109,14 +107,14 @@ import { GithubOutlined } from '@ant-design/icons-vue'
   .group-title {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--text-main);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 8px;
   }
 
   .footer-link {
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 0.9rem;
     text-decoration: none;
     transition: all 0.3s;
@@ -133,10 +131,10 @@ import { GithubOutlined } from '@ant-design/icons-vue'
   justify-content: space-between;
   align-items: center;
   padding-top: 30px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  border-top: 1px solid var(--border-glass);
 
   .copyright {
-    color: #9ca3af;
+    color: var(--text-muted);
     font-size: 0.85rem;
     margin: 0;
   }
@@ -147,12 +145,12 @@ import { GithubOutlined } from '@ant-design/icons-vue'
   gap: 20px;
 
   .social-link {
-    color: #9ca3af;
+    color: var(--text-muted);
     font-size: 1.25rem;
     transition: all 0.3s;
 
     &:hover {
-      color: #1a1a1a;
+      color: var(--text-main);
       transform: translateY(-2px);
     }
   }
