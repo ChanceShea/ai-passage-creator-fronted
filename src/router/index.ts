@@ -23,6 +23,11 @@ const router = createRouter({
       name: '文章创作',
       component: () => import('@/views/article/ArticleCreateVIew.vue'),
     },
+    {
+      path: '/article/list',
+      name: '文章列表',
+      component: () => import('@/views/article/ArticleListView.vue'),
+    },
   ],
 })
 
