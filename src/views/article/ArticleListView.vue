@@ -344,7 +344,7 @@ const getStatusText = (status: string) => {
 
 // 查看文章详情
 const viewArticle = (record: API.ArticleVO) => {
-  router.push(`/article/${record.id}`)
+  router.push(`/article/${record.taskId}`)
 }
 
 // 格式化日期

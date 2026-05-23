@@ -28,6 +28,11 @@ const router = createRouter({
       name: '文章列表',
       component: () => import('@/views/article/ArticleListView.vue'),
     },
+    {
+      path: '/article/:taskId',
+      name: '文章详情',
+      component: () => import('@/views/article/ArticleDetailView.vue'),
+    },
   ],
 })
 
