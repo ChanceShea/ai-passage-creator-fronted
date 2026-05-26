@@ -167,6 +167,7 @@ import { onMounted, ref } from 'vue'
 import { getArticle, listArticle, deleteArticle } from '@/api/articleController'
 import dayjs, { Dayjs } from 'dayjs'
 import { message, Modal } from 'ant-design-vue'
+import { useLoginUserStore } from '@/stores/loginUser'
 
 const router = useRouter()
 
@@ -242,16 +243,21 @@ const handleStatusChange = () => {
 }
 
 // 表格改变时触发
-const handleTableChange = () => {
-  pagination.value.current = 1
+const handleTableChange = (pag: any) => {
+  pagination.value.current = pag.current
+  pagination.value.pageSize = pag.pageSize
   loadData()
 }
+
+const loginUser = useLoginUserStore().loginUser
 
 // 加载文章列表
 const loadData = async () => {
   loading.value = true
   try {
     const res = await listArticle({
+      userId: loginUser?.id || '',
+      status: statusFilter.value,
       page: pagination.value.current,
       size: pagination.value.pageSize,
     })

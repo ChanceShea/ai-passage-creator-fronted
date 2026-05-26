@@ -60,6 +60,35 @@
                 show-count
                 class="topic-textarea"
               />
+              <!-- 文章风格选择 -->
+              <div class="style-section">
+                <div class="section-header">
+                  <span class="section-title">文章风格</span>
+                  <span class="section-tip">(不选择使用默认风格)</span>
+                </div>
+                <a-radio-group v-model:value="selectedStyle" class="style-group">
+                  <a-radio value="">默认</a-radio>
+                  <a-radio value="tech">科技风格</a-radio>
+                  <a-radio value="emotional">情感风格</a-radio>
+                  <a-radio value="educational">教育风格</a-radio>
+                  <a-radio value="humorous">幽默风格</a-radio>
+                </a-radio-group>
+              </div>
+              <!-- 配图方式选择 -->
+              <div class="image-methods-section">
+                <div class="section-header">
+                  <span class="section-title">配图方式</span>
+                  <span class="section-tip">(不选择使用默认配图方式)</span>
+                </div>
+                <a-checkbox-group v-model:value="selectedImageMethods" class="methods-group">
+                  <a-checkbox value="PEXELS">Pexels</a-checkbox>
+                  <a-checkbox value="NANO_BANANA">Nano Banana</a-checkbox>
+                  <a-checkbox value="MERMAID">Mermaid</a-checkbox>
+                  <a-checkbox value="ICONIFY">Iconify</a-checkbox>
+                  <a-checkbox value="EMOJI_PACK">表情包</a-checkbox>
+                  <a-checkbox value="SVG_DIAGRAM">SVG</a-checkbox>
+                </a-checkbox-group>
+              </div>
               <a-button
                 type="primary"
                 size="large"
@@ -313,6 +342,8 @@ const taskId = ref('')
 const errorVisible = ref(false)
 const errorMessage = ref('')
 const hasQuota = ref(true)
+const selectedStyle = ref('')
+const selectedImageMethods = ref<string[]>([])
 
 // 大纲数据
 const outlineRaw = ref('')
@@ -406,7 +437,15 @@ const startCreate = async () => {
   isCreating.value = true
   currentStep.value = 0
   try {
-    const res = await createArticle({ topic: topic.value })
+    console.log('selectMethods:', selectedImageMethods.value)
+    const res = await createArticle({
+      topic: topic.value,
+      style: selectedStyle.value || undefined,
+      enableImageMethods:
+        selectedImageMethods.value && selectedImageMethods.value.length > 0
+          ? selectedImageMethods.value
+          : undefined,
+    })
     if (res.data.code === 200) {
       taskId.value = res.data.data || ''
     }
@@ -522,13 +561,16 @@ const resetCreate = () => {
   imageCount.value = 0
   imageProgress.value = 0
   outlineRaw.value = ''
-  article.value = {
+  ;((article.value = {
     mainTitle: '',
     subTitle: '',
     content: '',
     fullContent: '',
     images: [],
-  }
+  }),
+    // 重新创作
+    (selectedStyle.value = '')) // 重置风格
+  selectedImageMethods.value = [] // 重置配图方式
 }
 
 onMounted(() => {
@@ -610,11 +652,11 @@ onBeforeUnmount(() => {
   border-right: 1px solid var(--border-glass);
   display: flex;
   flex-direction: column;
-  padding: 40px 24px;
+  padding: 32px 20px;
   animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 
   .sidebar-header {
-    margin-bottom: 48px;
+    margin-bottom: 32px;
 
     .sidebar-title {
       font-family: 'Playfair Display', serif;
@@ -637,7 +679,7 @@ onBeforeUnmount(() => {
 .flow-timeline {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 20px;
 }
 
 .flow-item {
@@ -718,7 +760,7 @@ onBeforeUnmount(() => {
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding: 60px 40px;
+  padding: 40px 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -747,25 +789,25 @@ onBeforeUnmount(() => {
     backdrop-filter: blur(20px);
     border: 1px solid var(--border-glass);
     border-radius: 40px;
-    padding: 60px;
+    padding: 40px 48px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
   }
 
   .input-header {
     text-align: center;
-    margin-bottom: 48px;
+    margin-bottom: 32px;
 
     .input-title {
       font-family: 'Playfair Display', serif;
-      font-size: 3rem;
+      font-size: 2.75rem;
       font-weight: 700;
       color: var(--primary-color);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       letter-spacing: -0.01em;
     }
     .input-subtitle {
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 400;
     }
   }
@@ -774,10 +816,10 @@ onBeforeUnmount(() => {
     background: var(--bg-glass-deep) !important;
     border: 1px solid var(--border-glass) !important;
     border-radius: 20px !important;
-    padding: 24px !important;
-    font-size: 1.15rem !important;
+    padding: 16px 20px !important;
+    font-size: 1.1rem !important;
     transition: all 0.3s ease;
-    margin-bottom: 32px;
+    margin-bottom: 20px;
     color: var(--text-main) !important;
 
     &:focus {
@@ -788,12 +830,12 @@ onBeforeUnmount(() => {
   }
 
   .create-btn {
-    height: 64px !important;
-    border-radius: 18px !important;
+    height: 56px !important;
+    border-radius: 16px !important;
     background: var(--primary-color) !important;
     border: none !important;
     font-weight: 700 !important;
-    font-size: 1.15rem !important;
+    font-size: 1.1rem !important;
     width: 100%;
     letter-spacing: 0.02em;
     color: var(--text-inverse) !important;
@@ -803,6 +845,90 @@ onBeforeUnmount(() => {
       transform: translateY(-2px);
       box-shadow: 0 15px 30px rgba(var(--primary-color-rgb), 0.2) !important;
       opacity: 0.9;
+    }
+  }
+}
+
+/* Style & Image Methods Sections */
+.style-section,
+.image-methods-section {
+  margin-bottom: 24px;
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      letter-spacing: 0.02em;
+    }
+
+    .section-tip {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+  }
+
+  :deep(.ant-radio-group),
+  :deep(.ant-checkbox-group) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* Custom Radio & Checkbox Style */
+  :deep(.ant-radio-wrapper),
+  :deep(.ant-checkbox-wrapper) {
+    margin: 0 !important;
+    padding: 8px 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    span:last-child {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+      padding-inline-start: 8px;
+      padding-inline-end: 0;
+    }
+
+    &:hover {
+      border-color: var(--accent-color);
+      background: var(--bg-surface-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+    }
+
+    /* Selected State */
+    &.ant-radio-wrapper-checked,
+    &.ant-checkbox-wrapper-checked {
+      background: rgba(99, 102, 241, 0.06);
+      border-color: var(--accent-color);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+
+      span:last-child {
+        color: var(--accent-color);
+      }
+    }
+
+    /* Hide Original Radio/Checkbox Dot/Box */
+    .ant-radio,
+    .ant-checkbox {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
     }
   }
 }
@@ -1042,7 +1168,7 @@ onBeforeUnmount(() => {
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   border-left: 1px solid var(--border-glass);
-  padding: 40px 28px;
+  padding: 32px 24px;
   overflow-y: auto;
   animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -1059,9 +1185,9 @@ onBeforeUnmount(() => {
   }
 
   .panel-section {
-    margin-bottom: 40px;
-    padding-bottom: 40px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-glass);
 
     &:last-child {
       border-bottom: none;
@@ -1076,7 +1202,7 @@ onBeforeUnmount(() => {
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
   }
 }
@@ -1084,14 +1210,14 @@ onBeforeUnmount(() => {
 .hot-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 
   .hot-tag {
-    padding: 10px 18px;
+    padding: 8px 14px;
     background: var(--bg-surface);
     border: 1px solid var(--border-glass);
     border-radius: 12px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-main);
     cursor: pointer;
     transition: all 0.3s;
@@ -1109,8 +1235,8 @@ onBeforeUnmount(() => {
 
 .tip-item {
   display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 16px;
 
   .tip-icon {
     width: 28px;
@@ -1130,11 +1256,11 @@ onBeforeUnmount(() => {
   .tip-title {
     font-weight: 700;
     color: var(--primary-color);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     margin-bottom: 2px;
   }
   .tip-desc {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
     line-height: 1.4;
   }
