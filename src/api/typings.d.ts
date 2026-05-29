@@ -1,4 +1,21 @@
 declare namespace API {
+  type ArticleAiModifyOutlineDTO = {
+    taskId?: string
+    modifySuggestion?: string
+  }
+
+  type ArticleConfirmOutlineDTO = {
+    taskId?: string
+    outlines?: OutlineSection[]
+  }
+
+  type ArticleConfirmTitleDTO = {
+    taskId?: string
+    selectedMainTitle?: string
+    selectedSubTitle?: string
+    userDescription?: string
+  }
+
   type ArticleCreateDTO = {
     topic?: string
     style?: string
@@ -71,6 +88,12 @@ declare namespace API {
     points?: string[]
   }
 
+  type OutlineSection = {
+    section?: number
+    title?: string
+    points?: string[]
+  }
+
   type PageArticleVO = {
     records?: ArticleVO[]
     pageNumber?: number
@@ -78,6 +101,12 @@ declare namespace API {
     totalPage?: number
     totalRow?: number
     optimizeCountQuery?: boolean
+  }
+
+  type Result = {
+    code?: number
+    message?: string
+    data?: Record<string, any>
   }
 
   type ResultArticleVO = {
@@ -90,6 +119,12 @@ declare namespace API {
     code?: number
     message?: string
     data?: boolean
+  }
+
+  type ResultListOutlineSection = {
+    code?: number
+    message?: string
+    data?: OutlineSection[]
   }
 
   type ResultLoginUserVO = {

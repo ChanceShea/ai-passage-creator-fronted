@@ -15,8 +15,12 @@ export const connectSSE = (taskId: string, options: SSEOptions): EventSource => 
 
   const eventSource = new EventSource(`/api/article/progress/${taskId}`)
   eventSource.onmessage = (event) => {
+    console.log('=== SSE 接收到原始消息 ===')
+    console.log('event.data:', event.data)
     try {
       const message: SSEMessage = JSON.parse(event.data)
+      console.log('解析后的 message:', message)
+      console.log('message.type:', message.type)
       onMessage(message)
       if (message.type === 'ALL_COMPLETE' || message.type === 'ERROR') {
         eventSource.close()

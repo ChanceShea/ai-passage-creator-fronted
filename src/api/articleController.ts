@@ -16,6 +16,51 @@ export async function getArticle(
   })
 }
 
+/** 此处后端没有提供注释 POST /article/ai-modify-outline */
+export async function aiModifyOutline(
+  body: API.ArticleAiModifyOutlineDTO,
+  options?: { [key: string]: any }
+) {
+  return request<API.ResultListOutlineSection>('/article/ai-modify-outline', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** 此处后端没有提供注释 POST /article/confirm-outline */
+export async function confirmOutline(
+  body: API.ArticleConfirmOutlineDTO,
+  options?: { [key: string]: any }
+) {
+  return request<API.Result>('/article/confirm-outline', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** 此处后端没有提供注释 POST /article/confirm-title */
+export async function confirmTitle(
+  body: API.ArticleConfirmTitleDTO,
+  options?: { [key: string]: any }
+) {
+  return request<API.Result>('/article/confirm-title', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** 此处后端没有提供注释 POST /article/create */
 export async function createArticle(body: API.ArticleCreateDTO, options?: { [key: string]: any }) {
   return request<API.ResultString>('/article/create', {
