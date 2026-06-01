@@ -50,6 +50,10 @@ declare namespace API {
     completedTime?: string
   }
 
+  type createPaymentRecordParams = {
+    dto: PaymentRecordAddDTO
+  }
+
   type DeleteRequest = {
     id?: string
   }
@@ -80,6 +84,7 @@ declare namespace API {
     userRole?: string
     createTime?: string
     updateTime?: string
+    vipTime?: string
   }
 
   type OutlineItem = {
@@ -101,6 +106,28 @@ declare namespace API {
     totalPage?: number
     totalRow?: number
     optimizeCountQuery?: boolean
+  }
+
+  type PaymentRecordAddDTO = {
+    currency?: string
+    description?: string
+    amount?: number
+    paymentType?: string
+    productType?: string
+  }
+
+  type PaymentRecordVO = {
+    userId?: string
+    orderId?: string
+    amount?: number
+    currency?: string
+    status?: string
+    productType?: string
+  }
+
+  type payParams = {
+    orderId: string
+    userId: number
   }
 
   type Result = {
@@ -143,6 +170,12 @@ declare namespace API {
     code?: number
     message?: string
     data?: PageArticleVO
+  }
+
+  type ResultPaymentRecordVO = {
+    code?: number
+    message?: string
+    data?: PaymentRecordVO
   }
 
   type ResultString = {

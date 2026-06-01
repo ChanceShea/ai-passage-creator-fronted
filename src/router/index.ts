@@ -45,6 +45,11 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/vip',
+      name: '用户升级',
+      component: () => import('@/views/vip/VipView.vue'),
+    },
   ],
 })
 

@@ -51,6 +51,14 @@
         </div>
 
         <div v-if="loginUserStore.loginUser.id" class="user-area">
+          <RouterLink v-if="isVip" to="/vip" class="upgrade-vip-btn">
+            <CrownOutlined />
+            <span>升级会员</span>
+          </RouterLink>
+          <RouterLink v-else to="/vip" class="vip-badge">
+            <CrownFilled />
+            <span>VIP</span>
+          </RouterLink>
           <a-dropdown placement="bottomRight">
             <div class="user-info">
               <a-avatar :src="loginUserStore.loginUser.userAvatar" :size="36" class="user-avatar">
@@ -60,6 +68,16 @@
             </div>
             <template #overlay>
               <a-menu class="dropdown-menu">
+                <a-menu-item
+                  v-if="isVip"
+                  key="vip-info"
+                  class="vip-info-item"
+                  @click="router.push('/vip')"
+                >
+                  <CrownFilled />
+                  <span>永久会员权益</span>
+                </a-menu-item>
+                <a-menu-divider v-if="isVip" />
                 <a-menu-item key="logout" @click="handleLogout" class="dropdown-item">
                   <LogoutOutlined />
                   <span>退出登录</span>
@@ -88,13 +106,21 @@ import {
   BulbOutlined,
   DesktopOutlined,
   BulbFilled,
+  CrownFilled,
+  CrownOutlined,
 } from '@ant-design/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
+import { USER_ROLE_VIP } from '@/constants/user'
+import { computed } from 'vue'
 
 const loginUserStore = useLoginUserStore()
 const themeStore = useThemeStore()
 const router = useRouter()
 const currentRoute = useRoute()
+
+const isVip = computed(() => {
+  return loginUserStore.loginUser.userRole === USER_ROLE_VIP
+})
 
 const menuItems = [
   { key: '/article/create', label: '文章创作' },
@@ -222,6 +248,98 @@ const handleLogout = async () => {
 }
 
 .user-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .vip-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.6s;
+    }
+
+    &:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
+
+      &::before {
+        left: 100%;
+      }
+    }
+
+    svg {
+      font-size: 1rem;
+      animation: crownShine 2s ease-in-out infinite;
+    }
+  }
+
+  .upgrade-vip-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #4f46e5 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #f59e0b, #7c3aed, #6366f1, #f59e0b);
+      background-size: 400% 400%;
+      border-radius: 22px;
+      z-index: -1;
+      animation: gradientBorder 3s ease infinite;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    svg {
+      font-size: 1rem;
+    }
+  }
+
   .user-info {
     display: flex;
     align-items: center;
@@ -291,6 +409,31 @@ const handleLogout = async () => {
   backdrop-filter: blur(20px);
   background: rgba(255, 255, 255, 0.9) !important;
 
+  .vip-info-item {
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.1) 0%,
+      rgba(217, 119, 6, 0.1) 100%
+    ) !important;
+    color: #d97706 !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    margin-bottom: 4px !important;
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(245, 158, 11, 0.2) 0%,
+        rgba(217, 119, 6, 0.2) 100%
+      ) !important;
+    }
+
+    svg {
+      color: #f59e0b !important;
+    }
+  }
+
   .dropdown-item {
     border-radius: 10px !important;
     font-weight: 500 !important;
@@ -303,6 +446,26 @@ const handleLogout = async () => {
   }
 }
 
+@keyframes crownShine {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+  }
+}
+
+@keyframes gradientBorder {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 @media (max-width: 768px) {
   .header-container {
     padding: 0 20px;
@@ -310,6 +473,14 @@ const handleLogout = async () => {
 
   .nav-center {
     display: none;
+  }
+
+  .user-area {
+    .vip-badge,
+    .upgrade-vip-btn {
+      padding: 6px 12px;
+      font-size: 0.75rem;
+    }
   }
 }
 </style>
