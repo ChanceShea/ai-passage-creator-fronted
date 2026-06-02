@@ -85,6 +85,7 @@ declare namespace API {
     createTime?: string
     updateTime?: string
     vipTime?: string
+    quota?: number
   }
 
   type OutlineItem = {

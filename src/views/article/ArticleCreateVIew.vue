@@ -84,12 +84,27 @@
                   </div>
                   <a-checkbox-group v-model:value="selectedImageMethods" class="methods-group">
                     <a-checkbox value="PEXELS">Pexels</a-checkbox>
-                    <a-checkbox value="NANO_BANANA">Nano Banana</a-checkbox>
+                    <a-tooltip :title="isVip ? '' : '仅限VIP用户使用'">
+                      <a-checkbox value="NANO_BANANA" :disabled="!isVip">
+                        Nano Banana
+                        <CrownOutlined v-if="!isVip" class="vip-icon" />
+                      </a-checkbox>
+                    </a-tooltip>
                     <a-checkbox value="MERMAID">Mermaid</a-checkbox>
                     <a-checkbox value="ICONIFY">Iconify</a-checkbox>
                     <a-checkbox value="EMOJI_PACK">表情包</a-checkbox>
-                    <a-checkbox value="SVG_DIAGRAM">SVG</a-checkbox>
+                    <a-tooltip :title="isVip ? '' : '仅限VIP用户使用'">
+                      <a-checkbox value="SVG_DIAGRAM" :disabled="!isVip">
+                        SVG
+                        <CrownOutlined v-if="!isVip" class="vip-icon" />
+                      </a-checkbox>
+                    </a-tooltip>
                   </a-checkbox-group>
+                </div>
+                <div v-if="!isVip" class="vip-notice">
+                  <CrownOutlined />
+                  <span>AI生图和SVG图表为VIP专属功能，</span>
+                  <RouterLink to="/vip" class="upgrade-link">立即升级</RouterLink>
                 </div>
                 <a-button
                   type="primary"
@@ -247,8 +262,38 @@
       </main>
       <!-- 辅助面板 -->
       <aside class="sidebar-right">
+        <div v-if="currentPhase === 'INPUT'" class="panel-section quota-section">
+          <h4 class="panel-title">
+            <CrownOutlined />
+            创作配额
+          </h4>
+          <div v-if="isAdmin" class="quota-admin">
+            <span class="quota-badge admin">管理员</span>
+            <span class="quota-text">无限次</span>
+          </div>
+          <div v-else-if="isVip" class="quota-admin">
+            <span class="quota-badge vip">VIP会员</span>
+            <span class="quota-text">无限次</span>
+          </div>
+          <div v-else class="quota-info">
+            <div class="quota-display">
+              <span class="quota-number" :class="{ low: quota <= 1, empty: quota === 0 }">{{
+                quota
+              }}</span>
+              <span class="quota-unit">次</span>
+            </div>
+            <div class="quota-label">剩余可用</div>
+            <a-progress
+              :percent="(quota / 5) * 100"
+              :show-info="false"
+              :stroke-color="quota <= 1 ? '#FF4D4F' : '#22C55E'"
+              size="small"
+              class="quota-progress"
+            />
+          </div>
+        </div>
         <!-- 热门选题 -->
-        <div v-if="!isCreating && !isCompleted" class="panel-section">
+        <div v-if="currentPhase === 'INPUT'" class="panel-section">
           <h4 class="panel-title">
             <BulbOutlined />
             热门选题
@@ -267,7 +312,7 @@
         </div>
 
         <!-- 创作技巧 -->
-        <div v-if="!isCreating && !isCompleted" class="panel-section">
+        <div v-if="currentPhase === 'INPUT'" class="panel-section">
           <h4 class="panel-title">
             <StarOutlined />
             爆款技巧
@@ -299,7 +344,12 @@
           </div>
         </div>
         <!-- 创作进行中的提示 -->
-        <div v-if="isCreating && !isCompleted" class="panel-section">
+        <div
+          v-if="
+            isCreating || currentPhase === 'TITLE_SELECTING' || currentPhase === 'OUTLINE_EDITING'
+          "
+          class="panel-section"
+        >
           <h4 class="panel-title">
             <ClockCircleOutlined />
             创作进度
@@ -316,9 +366,13 @@
             </div>
           </div>
 
-          <div class="progress-tip">
+          <div v-if="isCreating" class="progress-tip">
             <InfoCircleOutlined />
             <span>AI 正在努力创作中，请耐心等待...</span>
+          </div>
+          <div v-else class="progress-tip waiting">
+            <InfoCircleOutlined />
+            <span>等待您的确认</span>
           </div>
         </div>
         <!-- 操作按钮 -->
@@ -395,10 +449,17 @@ import {
   InfoCircleOutlined,
   StarOutlined,
   ClockCircleOutlined,
+  CrownOutlined,
 } from '@ant-design/icons-vue'
 import TitleSelectingStage from './components/TitleSelectingStage.vue'
 import OutlinedEditingStage from './components/OutlinedEditingStage.vue'
-
+import { useLoginUserStore } from '@/stores/loginUser.ts'
+import { USER_ROLE_VIP } from '@/constants/user.ts'
+import {
+  isAdmin as checkIsAdmin,
+  isVip as checkIsVip,
+  hasQuota as checkHasQuota,
+} from '@/utils/permission.ts'
 const router = useRouter()
 const route = useRoute()
 
@@ -430,8 +491,14 @@ const currentStep = ref(0)
 const taskId = ref('')
 const errorVisible = ref(false)
 const errorMessage = ref('')
-const hasQuota = ref(true)
 const selectedStyle = ref('')
+const loginUserStore = useLoginUserStore()
+// 配额相关计算
+const isVip = computed(() => checkIsVip(loginUserStore.loginUser))
+const isAdmin = computed(() => checkIsAdmin(loginUserStore.loginUser))
+const quota = computed(() => loginUserStore.loginUser.quota ?? 0)
+const hasQuota = computed(() => checkHasQuota(loginUserStore.loginUser))
+
 const selectedImageMethods = ref<string[]>([])
 // 当前阶段
 const currentPhase = ref<string>('INPUT')
@@ -1655,6 +1722,101 @@ const handleConfirmOutline = async (
   }
 }
 
+.quota-section {
+  .quota-admin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+
+    .quota-badge {
+      padding: 6px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &.admin {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--accent-color);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      &.vip {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+      }
+    }
+
+    .quota-text {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+  }
+
+  .quota-info {
+    padding: 20px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    text-align: center;
+
+    .quota-display {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 12px;
+
+      .quota-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &.low {
+          color: #f59e0b;
+        }
+
+        &.empty {
+          color: #ef4444;
+        }
+      }
+
+      .quota-unit {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+    }
+
+    .quota-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .quota-progress {
+      :deep(.ant-progress-bg) {
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    }
+  }
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1666,6 +1828,12 @@ const handleConfirmOutline = async (
     border-radius: 16px;
     border: 1px solid var(--border-glass);
     text-align: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    }
 
     .stat-value {
       font-size: 1.25rem;

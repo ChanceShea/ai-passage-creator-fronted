@@ -47,12 +47,12 @@
         </div>
       </div>
     </div>
-    <div class="ai-chat-section">
+    <div class="ai-chat-section" :class="{ 'vip-only': !isVip }">
       <div class="chat-header">
         <RobotOutlined />
         <span class="chat-title"> AI助手修改大纲 </span>
       </div>
-      <div class="chat-input wrapper">
+      <div v-if="isVip" class="chat-input wrapper">
         <a-textarea
           v-model:value="modifySuggestion"
           placeholder="告诉AI如何修改大纲，例如：请在第二章节后面增加一个关于实践案例的章节"
@@ -71,6 +71,11 @@
           <template #icon><RobotOutlined /></template>
           AI修改大纲
         </a-button>
+      </div>
+      <div v-else class="vip-upgrade-notice">
+        <CrownOutlined class="vip-icon" />
+        <p>AI修改大纲功能仅限VIP会员使用</p>
+        <RouterLink to="/vip" class="upgrade-btn"> 立即升级VIP </RouterLink>
       </div>
     </div>
     <div class="actions">
@@ -95,10 +100,18 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { DeleteOutlined, PlusOutlined, RobotOutlined, CheckOutlined } from '@ant-design/icons-vue'
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  RobotOutlined,
+  CheckOutlined,
+  CrownOutlined,
+} from '@ant-design/icons-vue'
 import Sortable from 'sortablejs'
 import { message } from 'ant-design-vue'
 import { aiModifyOutline } from '@/api/articleController'
+import { isVip as checkIfVip } from '@/utils/permission'
+import { useLoginUserStore } from '@/stores/loginUser'
 
 interface OutlineSection {
   section: number
@@ -119,6 +132,10 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
 })
+
+const loginUserStore = useLoginUserStore()
+
+const isVip = computed(() => checkIfVip(loginUserStore.loginUser))
 
 const emit = defineEmits<Emits>()
 

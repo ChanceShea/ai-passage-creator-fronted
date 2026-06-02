@@ -129,6 +129,35 @@ const features = [
   },
 ]
 
+// 价格卡片特性
+const pricingFeatures = [
+  '无限创作配额',
+  '全部高级配图功能',
+  'AI 大纲智能编辑',
+  '优先生成队列',
+  '终身有效',
+]
+
+// faq列表
+const faqs = [
+  {
+    question: '支付后多久生效？',
+    answer: '支付成功后立即生效，您将立即获得永久会员权限，刷新页面即可看到变化。',
+  },
+  {
+    question: '如何申请退款？',
+    answer: '购买后 7 天内，如不满意可申请退款，退款后会员权限将被取消。',
+  },
+  {
+    question: '会员是否需要续费？',
+    answer: '不需要。永久会员一次购买，终身有效，无需任何续费。',
+  },
+  {
+    question: '支付安全吗？',
+    answer: '我们使用 Stripe 国际支付平台，全程加密传输，安全可靠。',
+  },
+]
+
 onMounted(async () => {
   const success = route.query.success
   const cancelled = route.query.cancelled
