@@ -1,4 +1,30 @@
 declare namespace API {
+  type AgentExecutionStatsVO = {
+    taskId?: string
+    totalDurationMs?: number
+    agentCount?: number
+    agentDurations?: Record<string, any>
+    overallStatus?: string
+    logs?: AgentLog[]
+  }
+
+  type AgentLog = {
+    id?: number
+    taskId?: string
+    agentName?: string
+    startTime?: string
+    endTime?: string
+    durationMs?: number
+    status?: string
+    errorMessage?: string
+    prompt?: string
+    inputData?: string
+    outputData?: string
+    createTime?: string
+    updateTime?: string
+    isDelete?: number
+  }
+
   type ArticleAiModifyOutlineDTO = {
     taskId?: string
     modifySuggestion?: string
@@ -59,6 +85,10 @@ declare namespace API {
   }
 
   type getArticleParams = {
+    taskId: string
+  }
+
+  type getExecutionLogsParams = {
     taskId: string
   }
 
@@ -135,6 +165,12 @@ declare namespace API {
     code?: number
     message?: string
     data?: Record<string, any>
+  }
+
+  type ResultAgentExecutionStatsVO = {
+    code?: number
+    message?: string
+    data?: AgentExecutionStatsVO
   }
 
   type ResultArticleVO = {

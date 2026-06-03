@@ -49,6 +49,85 @@
             <p class="sub-title" v-if="article.subTitle">{{ article.subTitle }}</p>
           </div>
 
+          <a-divider />
+          <!-- 执行日志面板 -->
+          <div
+            v-if="executionStats && executionStats.logs && executionStats.logs.length > 0"
+            class="execution-logs-section"
+          >
+            <div class="logs-header" @click="showExecutionLogs = !showExecutionLogs">
+              <h2 class="section-title">
+                <ClockCircleOutlined class="section-icon" />
+                执行日志
+                <a-tag
+                  :color="getStatusColor(executionStats.overallStatus ?? '')"
+                  class="status-tag-small"
+                >
+                  {{ executionStats.overallStatus ?? '' }}
+                </a-tag>
+              </h2>
+              <ThunderboltOutlined :class="['toggle-icon', { expanded: showExecutionLogs }]" />
+            </div>
+            <Transition name="expand">
+              <div v-show="showExecutionLogs" class="logs-content">
+                <div class="staus-summary">
+                  <div class="stat-item">
+                    <span class="label">总耗时</span>
+                    <span class="value">{{ executionStats.totalDurationMs || 0 }}ms</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="label">智能体数量</span>
+                    <span class="value">{{ executionStats.agentCount || 0 }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="label">平均耗时</span>
+                    <span class="value"
+                      >{{
+                        executionStats.agentCount && executionStats.totalDurationMs
+                          ? Math.round(executionStats.totalDurationMs / executionStats.agentCount)
+                          : 0
+                      }}ms</span
+                    >
+                  </div>
+                </div>
+                <div class="agent-timeline">
+                  <div
+                    v-for="log in executionStats.logs"
+                    :key="log.id"
+                    :class="['timeline-item', log.status?.toLowerCase()]"
+                  >
+                    <div class="timeline-indicator">
+                      <CheckCircleOutlined v-if="log.status === 'SUCCESS'" class="icon success" />
+                      <CloseCircleOutlined
+                        v-else-if="log.status === 'FAILED'"
+                        class="icon failed"
+                      />
+                      <LoadingOutlined v-else class="icon running" />
+                    </div>
+                    <div class="timeline-content">
+                      <div class="timeline-header">
+                        <span class="agent-name">{{
+                          getAgentDisplayName(log.agentName ?? '')
+                        }}</span>
+                        <span class="duration">{{ log.durationMs || 0 }}ms</span>
+                      </div>
+                      <div class="timeline-time">
+                        {{ log.startTime ? formatDate(log.startTime) : '' }}
+                      </div>
+                      <div v-if="log.errorMessage" class="error-message">
+                        <CloseCircleOutlined /> {{ log.errorMessage }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+          </div>
+          <a-divider
+            v-if="executionStats && executionStats.logs && executionStats.logs.length > 0"
+          />
+
+          <!-- 大纲 -->
           <div v-if="article.outline && article.outline.length > 0" class="outline-section">
             <div class="section-header">
               <div class="section-line"></div>
@@ -106,16 +185,39 @@ import {
   FileTextOutlined,
   OrderedListOutlined,
   DownloadOutlined,
+  ClockCircleOutlined,
+  ThunderboltOutlined,
+  CheckCircleOutlined,
+  LoadingOutlined,
+  CloseCircleOutlined,
 } from '@ant-design/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { marked } from 'marked'
 import { Modal } from 'ant-design-vue'
+import { getExecutionLogs } from '@/api/agentLogController'
 
 const route = useRoute()
 const article = ref<API.ArticleVO | null>(null)
 const loading = ref(false)
 const router = useRouter()
+const executionStats = ref<API.AgentExecutionStatsVO | null>(null)
+const logLoading = ref(false)
+const showExecutionLogs = ref(false)
+
+const loadExecutionLogs = async (taskId: string) => {
+  logLoading.value = true
+  try {
+    const res = await getExecutionLogs({ taskId: taskId })
+    if (res.data.code === 200 && res.data.data) {
+    }
+    executionStats.value = res.data.data ?? null
+  } catch (e: any) {
+    console.error('加载执行日志失败：', e)
+  } finally {
+    logLoading.value = false
+  }
+}
 
 // 加载文章详情
 const loadArticle = async () => {
@@ -130,11 +232,35 @@ const loadArticle = async () => {
     if (res.data.code === 200 && res.data.data) {
       article.value = res.data.data
     }
+    await loadExecutionLogs(taskId)
   } catch (err: any) {
     message.error(err.message || '加载文章详情失败')
   } finally {
     loading.value = false
   }
+}
+
+const getStatusColor = (status: string) => {
+  const colorMap: Record<string, string> = {
+    PENDING: 'default',
+    PROCESSING: 'processing',
+    COMPLETED: 'success',
+    FAILED: 'error',
+  }
+  return colorMap[status] || 'default'
+}
+
+const getAgentDisplayName = (agentName: string) => {
+  const nameMap: Record<string, string> = {
+    agent1_generate_titles: '生成标题',
+    agent2_generate_outline: '生成大纲',
+    agent3_generate_content: '生成正文',
+    agent4_analyze_image_requirements: '分析配图需求',
+    agent5_generate_images: '生成配图',
+    merge_images_into_content: '图文合成',
+    ai_modify_outline: 'AI修改大纲',
+  }
+  return nameMap[agentName] || agentName
 }
 
 const goBack = () => {
@@ -533,6 +659,258 @@ onMounted(() => {
   }
 }
 
+/* Execution Logs Section */
+.execution-logs-section {
+  margin-bottom: 60px;
+
+  .logs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 24px 32px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      background: var(--bg-surface-soft);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--primary-color);
+      font-weight: 700;
+
+      .section-icon {
+        font-size: 1.2rem;
+      }
+
+      .status-tag-small {
+        margin-left: 12px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        border-radius: 8px;
+      }
+    }
+
+    .toggle-icon {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &.expanded {
+        transform: rotate(180deg);
+        color: var(--accent-color);
+      }
+    }
+  }
+
+  .logs-content {
+    padding: 32px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--border-glass);
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+    animation: expandIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .staus-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border-glass);
+
+    .stat-item {
+      text-align: center;
+      padding: 20px;
+      background: var(--bg-surface);
+      border-radius: 16px;
+      border: 1px solid var(--border-glass);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      .label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .value {
+        display: block;
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  .agent-timeline {
+    position: relative;
+    padding-left: 40px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent-color), transparent);
+      opacity: 0.3;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-glass);
+      border-radius: 16px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &:hover {
+        border-color: rgba(99, 102, 241, 0.2);
+        transform: translateX(8px);
+      }
+
+      &.success {
+        border-left: 3px solid #22c55e;
+      }
+
+      &.failed {
+        border-left: 3px solid #ef4444;
+      }
+
+      &.processing,
+      &.pending {
+        border-left: 3px solid #f59e0b;
+      }
+
+      .timeline-indicator {
+        position: absolute;
+        left: -52px;
+        top: 28px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-glass);
+        border: 2px solid var(--border-glass);
+        border-radius: 50%;
+
+        .icon {
+          font-size: 1.1rem;
+
+          &.success {
+            color: #22c55e;
+          }
+
+          &.failed {
+            color: #ef4444;
+          }
+
+          &.running {
+            color: #f59e0b;
+            animation: pulse 1.5s infinite;
+          }
+        }
+      }
+
+      .timeline-content {
+        .timeline-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+
+          .agent-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+          }
+
+          .duration {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            padding: 4px 12px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+          }
+        }
+
+        .timeline-time {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          margin-bottom: 12px;
+        }
+
+        .error-message {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          padding: 12px 16px;
+          background: rgba(239, 68, 68, 0.08);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          border-radius: 12px;
+          color: #dc2626;
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+      }
+    }
+  }
+}
+
+/* Expand Transition */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .content-section {
   .markdown-content {
     font-size: 1.15rem;
@@ -604,6 +982,18 @@ onMounted(() => {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
   }
 }
 
